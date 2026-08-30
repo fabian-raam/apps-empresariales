@@ -1,0 +1,22 @@
+{% extends 'citas/base.html' %}
+
+{% block titulo %}Reservar cita | Barbería{% endblock %}
+
+{% block contenido %}
+<section class="tarjeta">
+    <h2>Registrar una cita</h2>
+    <p><strong>Fecha:</strong> {{ fecha_texto }}</p>
+
+    {% if hay_horarios %}
+        <form method="post" action="{% url 'citas:reservar' %}">
+            {% csrf_token %}
+            {{ formulario.as_p }}
+            <button type="submit">Registrar cita</button>
+        </form>
+    {% else %}
+        <p>No quedan horarios disponibles para esta fecha.</p>
+    {% endif %}
+
+    <a class="enlace" href="{% url 'citas:lista' %}?fecha={{ fecha_texto }}">Volver a los horarios</a>
+</section>
+{% endblock %}

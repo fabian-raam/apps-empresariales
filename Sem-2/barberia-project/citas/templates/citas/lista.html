@@ -1,0 +1,53 @@
+{% extends 'citas/base.html' %}
+
+{% block titulo %}Horarios | Barbería{% endblock %}
+
+{% block contenido %}
+<section class="tarjeta">
+    <h2>1. Selecciona una fecha</h2>
+    <form method="get">
+        {{ formulario_fecha.as_p }}
+        <button type="submit">Consultar horarios</button>
+    </form>
+</section>
+
+{% if fecha_seleccionada %}
+<section class="tarjeta">
+    <h2>2. Horarios del {{ fecha_seleccionada|date:'d/m/Y' }}</h2>
+    <div class="horarios">
+        {% for horario in estado_horarios %}
+            <div class="horario {% if horario.ocupado %}ocupado{% else %}disponible{% endif %}">
+                <strong>{{ horario.texto }}</strong>
+                <span>{{ horario.barbero }}</span>
+                {% if horario.ocupado %}
+                    <span class="estado">Ocupado</span>
+                {% else %}
+                    <span class="estado">Disponible</span>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    <a class="boton" href="{% url 'citas:mostrar_reserva' %}?fecha={{ fecha_texto }}">Reservar un horario</a>
+</section>
+
+{% if citas_de_la_fecha %}
+<section class="tarjeta">
+    <h2>Citas registradas</h2>
+    {% for cita in citas_de_la_fecha %}
+        <div class="cita">
+            <div>
+                <strong>{{ cita.nombre_cliente }}</strong><br>
+                {{ cita.horario_texto }} — {{ cita.barbero }}
+            </div>
+            <form method="post" action="{% url 'citas:cancelar' %}">
+                {% csrf_token %}
+                <input type="hidden" name="fecha" value="{{ cita.fecha }}">
+                <input type="hidden" name="horario" value="{{ cita.horario }}">
+                <button class="cancelar" type="submit">Cancelar cita</button>
+            </form>
+        </div>
+    {% endfor %}
+</section>
+{% endif %}
+{% endif %}
+{% endblock %}

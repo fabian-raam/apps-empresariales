@@ -1,0 +1,24 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block titulo %}Citas de barbería{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'citas/estilos.css' %}">
+</head>
+<body>
+    <header>
+        <h1>Barbería</h1>
+        <p>Sistema de gestión de citas</p>
+    </header>
+    <main>
+        {% if messages %}
+            {% for message in messages %}
+                <p class="mensaje {{ message.tags }}">{{ message }}</p>
+            {% endfor %}
+        {% endif %}
+        {% block contenido %}{% endblock %}
+    </main>
+</body>
+</html>

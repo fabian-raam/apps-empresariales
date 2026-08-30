@@ -1,0 +1,33 @@
+body {
+    margin: 0;
+    background: #f3f1ed;
+    color: #292929;
+    font-family: Arial, sans-serif;
+}
+
+header {
+    padding: 22px;
+    background: #26211d;
+    color: white;
+    text-align: center;
+}
+
+header h1, header p { margin: 4px; }
+main { max-width: 900px; margin: 25px auto; padding: 0 15px; }
+.tarjeta { margin-bottom: 20px; padding: 22px; background: white; border-radius: 8px; }
+label { display: block; margin-bottom: 6px; font-weight: bold; }
+input, select { box-sizing: border-box; width: 100%; padding: 10px; }
+button, .boton { padding: 10px 16px; border: 0; border-radius: 5px; background: #875f3d; color: white; cursor: pointer; text-decoration: none; }
+.boton { display: inline-block; margin-top: 18px; }
+.horarios { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 10px; }
+.horario { padding: 14px; border-left: 5px solid; border-radius: 5px; }
+.horario span { display: block; margin-top: 6px; }
+.disponible { border-color: #26834a; background: #eaf7ef; }
+.ocupado { border-color: #b94242; background: #faeaea; }
+.estado { font-weight: bold; }
+.cita { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 12px 0; border-bottom: 1px solid #ddd; }
+.cancelar { background: #b94242; }
+.mensaje { padding: 12px; border-radius: 5px; background: #e6eef8; }
+.success { background: #e5f6eb; }
+.error, .errorlist { color: #a12626; }
+.enlace { display: inline-block; margin-top: 18px; }
