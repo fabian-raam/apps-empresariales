@@ -1,0 +1,13 @@
+{% extends 'restaurante/base.html' %}
+{% block contenido %}
+<h1>{{ accion }} · {{ titulo }}</h1>
+<form method="post" class="formulario">
+{% csrf_token %}{% if persona_form %}
+<fieldset>
+<legend>Datos personales</legend>{{ persona_form.as_p }}</fieldset>
+{% endif %}{{ form.as_p }}<div class="acciones">
+<button type="submit">Guardar</button>
+<a href="{% url lista_ruta %}">Volver al listado</a>
+</div>
+</form>
+{% endblock %}

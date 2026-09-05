@@ -1,0 +1,26 @@
+{% extends 'restaurante/base.html' %}
+{% block contenido %}
+<h1>{{ accion }}</h1>
+<p>Confirma la acción sobre: <strong>{{ objeto }}</strong>.</p>
+{% if accion == 'Eliminar' %}
+<p>Esta eliminación es permanente.</p>
+{% if conserva_persona %}
+<p>Se conservarán los datos de la Persona relacionada.</p>
+{% endif %}{% if relacionados %}
+<p>También se eliminarán estos registros relacionados:</p>
+<ul>
+{% for relacionado in relacionados %}
+<li>{{ relacionado }}</li>
+{% endfor %}
+</ul>
+{% endif %}{% else %}
+<p>Se conservará la reserva con estado cancelada. Su mesa, fecha y hora seguirán registradas y no se podrán duplicar.</p>
+{% endif %}
+<form method="post">
+{% csrf_token %}
+<div class="acciones">
+<button type="submit">{{ accion }}</button>
+<a href="{% url lista_ruta %}">Volver sin cambios</a>
+</div>
+</form>
+{% endblock %}

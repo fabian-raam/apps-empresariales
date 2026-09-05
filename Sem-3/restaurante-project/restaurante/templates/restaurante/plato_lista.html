@@ -1,0 +1,32 @@
+{% extends 'restaurante/lista.html' %}
+{% block tabla %}
+<div class="tabla">
+<table>
+    <thead>
+        <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Categoría</th>
+            <th scope="col">Precio</th>
+            <th scope="col">Imagen (URL)</th>
+            <th scope="col">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for plato in platos %}
+        <tr>
+            <td>{{ plato.nombre }}</td>
+            <td>{{ plato.categoria }}</td>
+            <td>{{ plato.precio }}</td>
+            <td>{{ plato.img_url|default:"Sin imagen" }}</td>
+            <td class="acciones">
+                <a href="{% url 'restaurante:plato_editar' plato.pk %}">Editar</a>
+                <a href="{% url 'restaurante:plato_eliminar' plato.pk %}">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No hay registros todavía.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

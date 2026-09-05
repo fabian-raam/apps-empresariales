@@ -1,0 +1,39 @@
+{% extends 'restaurante/lista.html' %}
+{% block tabla %}
+<div class="tabla">
+<table>
+    <thead>
+        <tr>
+            <th scope="col">Cliente</th>
+            <th scope="col">Mesa</th>
+            <th scope="col">Fecha</th>
+            <th scope="col">Hora</th>
+            <th scope="col">Cantidad personas</th>
+            <th scope="col">Estado</th>
+            <th scope="col">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for reserva in reservas %}
+        <tr>
+            <td>{{ reserva.cliente }}</td>
+            <td>{{ reserva.mesa }}</td>
+            <td>{{ reserva.fecha }}</td>
+            <td>{{ reserva.hora }}</td>
+            <td>{{ reserva.cantidad_personas }}</td>
+            <td>{{ reserva.get_estado_display }}</td>
+            <td class="acciones">
+                <a href="{% url 'restaurante:reserva_editar' reserva.pk %}">Editar</a>
+                <a href="{% url 'restaurante:reserva_eliminar' reserva.pk %}">Eliminar</a>
+                {% if reserva.estado != 'cancelada' %}
+                <a href="{% url 'restaurante:reserva_cancelar' reserva.pk %}">Cancelar reserva</a>
+                {% endif %}
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="7">No hay registros todavía.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

@@ -1,0 +1,9 @@
+{% extends 'restaurante/base.html' %}
+{% block titulo %}{{ titulo }} | Restaurante{% endblock %}
+{% block contenido %}
+<div class="encabezado">
+    <h1>{{ titulo }}</h1>
+    <a class="boton" href="{% url crear_ruta %}">Registrar</a>
+</div>
+{% block tabla %}{% endblock %}
+{% endblock %}

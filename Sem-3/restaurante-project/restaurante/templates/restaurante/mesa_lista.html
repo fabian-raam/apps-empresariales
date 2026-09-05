@@ -1,0 +1,30 @@
+{% extends 'restaurante/lista.html' %}
+{% block tabla %}
+<div class="tabla">
+<table>
+    <thead>
+        <tr>
+            <th scope="col">Número</th>
+            <th scope="col">Capacidad</th>
+            <th scope="col">Disponible</th>
+            <th scope="col">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for mesa in mesas %}
+        <tr>
+            <td>{{ mesa.numero }}</td>
+            <td>{{ mesa.capacidad }}</td>
+            <td>{{ mesa.disponible|yesno:"Sí,No" }}</td>
+            <td class="acciones">
+                <a href="{% url 'restaurante:mesa_editar' mesa.pk %}">Editar</a>
+                <a href="{% url 'restaurante:mesa_eliminar' mesa.pk %}">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">No hay registros todavía.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

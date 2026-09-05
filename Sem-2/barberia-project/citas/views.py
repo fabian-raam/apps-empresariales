@@ -2,7 +2,7 @@ from django.contrib import messages
 from django.shortcuts import redirect, render
 
 from .forms import CitaForm, FechaForm
-from .models import buscar_horario, citas, horario_esta_ocupado, horarios
+from .models import Cita, Horario
 
 
 def lista_citas(request):
@@ -18,13 +18,32 @@ def lista_citas(request):
     citas_de_la_fecha = []
 
     if fecha_seleccionada:
-        for horario in horarios:
-            ocupado = horario_esta_ocupado(fecha_texto, horario['valor'])
-            estado_horarios.append({**horario, 'ocupado': ocupado})
+        # QuerySets que consultan los horarios y las citas guardadas en SQLite.
+        horarios_guardados = Horario.objects.select_related('barbero').all()
+        citas_guardadas = Cita.objects.select_related(
+            'horario__barbero'
+        ).filter(fecha=fecha_seleccionada)
 
-        for cita in citas:
-            if cita['fecha'] == fecha_texto:
-                citas_de_la_fecha.append(cita)
+        horarios_ocupados = citas_guardadas.values_list(
+            'horario_id', flat=True
+        )
+
+        for horario in horarios_guardados:
+            estado_horarios.append({
+                'valor': horario.id,
+                'texto': str(horario),
+                'barbero': horario.barbero.nombre,
+                'ocupado': horario.id in horarios_ocupados,
+            })
+
+        for cita in citas_guardadas:
+            citas_de_la_fecha.append({
+                'nombre_cliente': cita.nombre_cliente,
+                'fecha': cita.fecha,
+                'horario': cita.horario.id,
+                'horario_texto': str(cita.horario),
+                'barbero': cita.horario.barbero.nombre,
+            })
 
     return render(request, 'citas/lista.html', {
         'formulario_fecha': formulario_fecha,
@@ -39,51 +58,55 @@ def reservar_cita(request):
     if request.method != 'POST':
         return redirect('citas:lista')
 
-    fecha_texto = request.POST.get('fecha', '')
-    disponibles = []
-    for horario in horarios:
-        if not horario_esta_ocupado(fecha_texto, horario['valor']):
-            disponibles.append(horario)
-
-    formulario = CitaForm(request.POST, horarios_disponibles=disponibles)
+    formulario = CitaForm(
+        request.POST,
+        horarios_disponibles=Horario.objects.all(),
+    )
 
     if formulario.is_valid():
         nombre = formulario.cleaned_data['nombre_cliente'].strip()
-        fecha = formulario.cleaned_data['fecha'].isoformat()
-        horario_seleccionado = formulario.cleaned_data['horario']
-        datos_horario = buscar_horario(horario_seleccionado)
+        fecha = formulario.cleaned_data['fecha']
+        horario_id = formulario.cleaned_data['horario']
+        horario_seleccionado = Horario.objects.filter(id=horario_id).first()
 
         if not nombre:
             formulario.add_error('nombre_cliente', 'Debes ingresar un nombre.')
-        elif datos_horario is None:
+        elif horario_seleccionado is None:
             formulario.add_error('horario', 'El horario seleccionado no existe.')
-        elif horario_esta_ocupado(fecha, horario_seleccionado):
+        elif Cita.objects.filter(
+            fecha=fecha,
+            horario=horario_seleccionado,
+        ).exists():
             formulario.add_error('horario', 'Ese horario ya está ocupado.')
         else:
-            # El barbero se obtiene automáticamente a partir del horario.
-            nueva_cita = {
-                'nombre_cliente': nombre,
-                'fecha': fecha,
-                'horario': horario_seleccionado,
-                'horario_texto': datos_horario['texto'],
-                'barbero': datos_horario['barbero'],
-            }
-            citas.append(nueva_cita)
+            # La nueva cita se guarda de forma permanente en SQLite.
+            Cita.objects.create(
+                nombre_cliente=nombre,
+                fecha=fecha,
+                horario=horario_seleccionado,
+            )
             messages.success(request, 'La cita fue registrada correctamente.')
-            return redirect(f'/citas/?fecha={fecha}')
+            return redirect(f'/citas/?fecha={fecha.isoformat()}')
 
     messages.error(request, 'Revisa los datos del formulario.')
-    return mostrar_reserva(request, formulario, fecha_texto)
+    return mostrar_reserva(
+        request,
+        formulario,
+        request.POST.get('fecha', ''),
+    )
 
 
 def mostrar_reserva(request, formulario=None, fecha_texto=None):
     if fecha_texto is None:
         fecha_texto = request.GET.get('fecha', '')
 
-    disponibles = []
-    for horario in horarios:
-        if not horario_esta_ocupado(fecha_texto, horario['valor']):
-            disponibles.append(horario)
+    horarios_ocupados = Cita.objects.filter(
+        fecha=fecha_texto
+    ).values_list('horario_id', flat=True)
+
+    disponibles = Horario.objects.exclude(
+        id__in=horarios_ocupados
+    ).select_related('barbero')
 
     if formulario is None:
         formulario = CitaForm(
@@ -94,7 +117,7 @@ def mostrar_reserva(request, formulario=None, fecha_texto=None):
     return render(request, 'citas/reservar.html', {
         'formulario': formulario,
         'fecha_texto': fecha_texto,
-        'hay_horarios': len(disponibles) > 0,
+        'hay_horarios': disponibles.exists(),
     })
 
 
@@ -103,7 +126,7 @@ def cancelar_cita(request):
         fecha = request.POST.get('fecha', '')
         horario = request.POST.get('horario', '')
 
-        # Al quitar la cita de la lista, el horario vuelve a estar disponible.
+        # Esta funcionalidad se adaptará al ORM en el ejercicio correspondiente.
         for cita in citas:
             if cita['fecha'] == fecha and cita['horario'] == horario:
                 citas.remove(cita)

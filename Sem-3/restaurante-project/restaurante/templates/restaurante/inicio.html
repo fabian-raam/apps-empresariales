@@ -1,0 +1,38 @@
+{% extends 'restaurante/base.html' %}
+{% block contenido %}
+<h1>Gestión del restaurante</h1>
+<p>Organiza tus mesas, registra reservas y consulta el menú.</p>
+<p><a class="boton" href="{% url 'restaurante:menu' %}">Consultar el menú</a></p>
+<div class="tarjetas">
+    <section class="tarjeta">
+        <h2>Clientes</h2>
+        <a href="{% url 'restaurante:cliente_lista' %}">Ver listado</a>
+        <a href="{% url 'restaurante:cliente_crear' %}">Registrar</a>
+    </section>
+    <section class="tarjeta">
+        <h2>Administradores</h2>
+        <a href="{% url 'restaurante:administrador_lista' %}">Ver listado</a>
+        <a href="{% url 'restaurante:administrador_crear' %}">Registrar</a>
+    </section>
+    <section class="tarjeta">
+        <h2>Mesas</h2>
+        <a href="{% url 'restaurante:mesa_lista' %}">Ver listado</a>
+        <a href="{% url 'restaurante:mesa_crear' %}">Registrar</a>
+    </section>
+    <section class="tarjeta">
+        <h2>Reservas</h2>
+        <a href="{% url 'restaurante:reserva_lista' %}">Ver listado</a>
+        <a href="{% url 'restaurante:reserva_crear' %}">Registrar</a>
+    </section>
+    <section class="tarjeta">
+        <h2>Categorías</h2>
+        <a href="{% url 'restaurante:categoria_lista' %}">Ver listado</a>
+        <a href="{% url 'restaurante:categoria_crear' %}">Registrar</a>
+    </section>
+    <section class="tarjeta">
+        <h2>Platos</h2>
+        <a href="{% url 'restaurante:plato_lista' %}">Ver listado</a>
+        <a href="{% url 'restaurante:plato_crear' %}">Registrar</a>
+    </section>
+</div>
+{% endblock %}

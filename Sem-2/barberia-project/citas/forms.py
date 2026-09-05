@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import horarios
+from .models import Horario
 
 
 class FechaForm(forms.Form):
@@ -23,9 +23,13 @@ class CitaForm(forms.Form):
     )
 
     def __init__(self, *args, **kwargs):
-        horarios_disponibles = kwargs.pop('horarios_disponibles', horarios)
+        horarios_disponibles = kwargs.pop('horarios_disponibles', None)
         super().__init__(*args, **kwargs)
+
+        if horarios_disponibles is None:
+            horarios_disponibles = Horario.objects.all()
+
         self.fields['horario'].choices = [
-            (horario['valor'], horario['texto'])
+            (horario.id, str(horario))
             for horario in horarios_disponibles
         ]

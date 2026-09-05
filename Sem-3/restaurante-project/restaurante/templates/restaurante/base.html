@@ -1,0 +1,7 @@
+{% load static %}
+<!doctype html>
+<html lang="es">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>{% block titulo %}Restaurante{% endblock %}</title><link rel="stylesheet" href="{% static 'restaurante/estilos.css' %}"></head>
+<body><header><a class="marca" href="{% url 'restaurante:inicio' %}">Restaurante</a><nav aria-label="Navegación principal">
+<a href="{% url 'restaurante:menu' %}">Menú</a><a href="{% url 'restaurante:cliente_lista' %}">Clientes</a><a href="{% url 'restaurante:administrador_lista' %}">Administradores</a><a href="{% url 'restaurante:mesa_lista' %}">Mesas</a><a href="{% url 'restaurante:reserva_lista' %}">Reservas</a><a href="{% url 'restaurante:categoria_lista' %}">Categorías</a><a href="{% url 'restaurante:plato_lista' %}">Platos</a>
+</nav></header><main>{% for message in messages %}<p class="aviso {{ message.tags }}" role="status">{{ message }}</p>{% endfor %}{% block contenido %}{% endblock %}</main><footer>Sistema de reservas y menú del restaurante</footer></body></html>

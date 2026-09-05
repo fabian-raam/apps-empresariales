@@ -1,0 +1,28 @@
+{% extends 'restaurante/lista.html' %}
+{% block tabla %}
+<div class="tabla">
+<table>
+    <thead>
+        <tr>
+            <th scope="col">Nombre</th>
+            <th scope="col">Activa</th>
+            <th scope="col">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for categoria in categorias %}
+        <tr>
+            <td>{{ categoria.nombre }}</td>
+            <td>{{ categoria.activa|yesno:"Sí,No" }}</td>
+            <td class="acciones">
+                <a href="{% url 'restaurante:categoria_editar' categoria.pk %}">Editar</a>
+                <a href="{% url 'restaurante:categoria_eliminar' categoria.pk %}">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="3">No hay registros todavía.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}
