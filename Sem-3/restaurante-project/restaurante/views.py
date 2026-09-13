@@ -1,8 +1,8 @@
 from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import PersonaForm, AdministradorForm, MesaForm, ReservaForm, CategoriaForm, PlatoForm
-from .models import Cliente, Administrador, Mesa, Reserva, Categoria, Plato
+from .forms import PersonaForm, AdministradorForm, MesaForm, ReservaForm, CategoriaForm, PlatoForm, DetalleReservaForm
+from .models import Cliente, Administrador, Mesa, Reserva, Categoria, Plato, DetalleReserva
 
 def inicio(request):
     return render(request, "restaurante/inicio.html")
@@ -201,7 +201,11 @@ def mesa_eliminar(request, pk):
 
 # Reservas
 def reserva_lista(request):
-    reservas = Reserva.objects.all().select_related('cliente__persona', 'mesa').order_by('-fecha', '-hora')
+    reservas = (
+        Reserva.objects.select_related("cliente__persona", "mesa", "ficha")
+        .prefetch_related("solicitudes")
+        .order_by("-fecha", "-hora")
+    )
     return render(request, "restaurante/reserva_lista.html", {
         "reservas": reservas,
         "titulo": "Reservas",
@@ -319,7 +323,11 @@ def categoria_eliminar(request, pk):
 
 # Platos
 def plato_lista(request):
-    platos = Plato.objects.all().select_related('categoria').order_by('categoria__nombre', 'nombre')
+    platos = (
+        Plato.objects.select_related("categoria")
+        .prefetch_related("detalles_reserva__reserva")
+        .order_by("categoria__nombre", "nombre")
+    )
     return render(request, "restaurante/plato_lista.html", {
         "platos": platos,
         "titulo": "Platos",
@@ -383,6 +391,65 @@ def reserva_cancelar(request, pk):
         messages.success(request, "Reserva cancelada. El registro se conserva.")
         return redirect("restaurante:reserva_lista")
     return render(request, "restaurante/confirmar.html", {"lista_ruta": "restaurante:reserva_lista", "objeto": reserva, "accion": "Cancelar reserva"})
+
+
+def detalle_lista(request):
+    detalles = DetalleReserva.objects.select_related(
+        "reserva__cliente__persona", "reserva__mesa", "plato"
+    ).order_by("-reserva__fecha", "-reserva__hora", "plato__nombre")
+    return render(request, "restaurante/detalle_lista.html", {
+        "detalles": detalles,
+        "titulo": "Detalles de reserva",
+        "crear_ruta": "restaurante:detalle_crear",
+    })
+
+
+def detalle_crear(request):
+    if request.method == "POST":
+        form = DetalleReservaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Detalle registrado correctamente.")
+            return redirect("restaurante:detalle_lista")
+    else:
+        form = DetalleReservaForm()
+    return render(request, "restaurante/form.html", {
+        "form": form,
+        "titulo": "Detalles de reserva",
+        "accion": "Registrar",
+        "lista_ruta": "restaurante:detalle_lista",
+    })
+
+
+def detalle_editar(request, pk):
+    detalle = get_object_or_404(DetalleReserva, pk=pk)
+    if request.method == "POST":
+        form = DetalleReservaForm(request.POST, instance=detalle)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Detalle actualizado correctamente.")
+            return redirect("restaurante:detalle_lista")
+    else:
+        form = DetalleReservaForm(instance=detalle)
+    return render(request, "restaurante/form.html", {
+        "form": form,
+        "titulo": "Detalles de reserva",
+        "accion": "Editar",
+        "lista_ruta": "restaurante:detalle_lista",
+    })
+
+
+def detalle_eliminar(request, pk):
+    detalle = get_object_or_404(DetalleReserva.objects.select_related("plato"), pk=pk)
+    if request.method == "POST":
+        detalle.delete()
+        messages.success(request, "Detalle eliminado correctamente.")
+        return redirect("restaurante:detalle_lista")
+    return render(request, "restaurante/confirmar.html", {
+        "objeto": detalle,
+        "accion": "Eliminar",
+        "lista_ruta": "restaurante:detalle_lista",
+    })
 
 
 def menu(request):

@@ -1,3 +1,5 @@
+# Dependencias del restaurante (Semana 4).
+# Las relaciones y el CRUD utilizan Django ORM; no requieren paquetes adicionales.
 Django==6.1.1
 asgiref==3.12.1
 sqlparse==0.6.0

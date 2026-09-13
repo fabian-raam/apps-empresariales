@@ -10,6 +10,8 @@
             <th scope="col">Hora</th>
             <th scope="col">Cantidad personas</th>
             <th scope="col">Estado</th>
+            <th scope="col">Ficha</th>
+            <th scope="col">Solicitudes</th>
             <th scope="col">Acciones</th>
         </tr>
     </thead>
@@ -22,6 +24,23 @@
             <td>{{ reserva.hora }}</td>
             <td>{{ reserva.cantidad_personas }}</td>
             <td>{{ reserva.get_estado_display }}</td>
+            <td>
+                {% if reserva.ficha %}
+                <p>{{ reserva.ficha.ocasion|default:"Sin ocasión indicada" }}</p>
+                <p>{{ reserva.ficha.observaciones|default:"Sin observaciones" }}</p>
+                {% else %}
+                Sin ficha
+                {% endif %}
+            </td>
+            <td>
+                <ul>
+                    {% for solicitud in reserva.solicitudes.all %}
+                    <li>{{ solicitud.descripcion }}: {{ solicitud.atendida|yesno:"Atendida,Pendiente" }}</li>
+                    {% empty %}
+                    <li>Sin solicitudes</li>
+                    {% endfor %}
+                </ul>
+            </td>
             <td class="acciones">
                 <a href="{% url 'restaurante:reserva_editar' reserva.pk %}">Editar</a>
                 <a href="{% url 'restaurante:reserva_eliminar' reserva.pk %}">Eliminar</a>
@@ -31,7 +50,7 @@
             </td>
         </tr>
         {% empty %}
-        <tr><td colspan="7">No hay registros todavía.</td></tr>
+        <tr><td colspan="9">No hay registros todavía.</td></tr>
         {% endfor %}
     </tbody>
 </table>

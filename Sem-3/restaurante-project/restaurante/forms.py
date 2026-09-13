@@ -4,6 +4,7 @@ from .models import (
     Administrador,
     Categoria,
     Cliente,
+    DetalleReserva,
     Mesa,
     Persona,
     Plato,
@@ -20,6 +21,19 @@ class PersonaForm(forms.ModelForm):
             "telefono",
             "correo",
         ]
+
+
+class DetalleReservaForm(forms.ModelForm):
+    class Meta:
+        model = DetalleReserva
+        fields = ["reserva", "plato", "cantidad", "precio_unitario"]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["reserva"].queryset = Reserva.objects.select_related(
+            "cliente__persona", "mesa"
+        ).order_by("-fecha", "-hora")
+        self.fields["plato"].queryset = Plato.objects.order_by("nombre")
 
 class AdministradorForm(forms.ModelForm):
     class Meta:

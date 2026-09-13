@@ -1,0 +1,32 @@
+{% extends 'restaurante/lista.html' %}
+{% block tabla %}
+<div class="tabla">
+<table>
+    <thead>
+        <tr>
+            <th scope="col">Reserva</th>
+            <th scope="col">Plato</th>
+            <th scope="col">Cantidad</th>
+            <th scope="col">Precio unitario</th>
+            <th scope="col">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for detalle in detalles %}
+        <tr>
+            <td>{{ detalle.reserva }}</td>
+            <td>{{ detalle.plato }}</td>
+            <td>{{ detalle.cantidad }}</td>
+            <td>S/ {{ detalle.precio_unitario|floatformat:2 }}</td>
+            <td class="acciones">
+                <a href="{% url 'restaurante:detalle_editar' detalle.pk %}">Editar</a>
+                <a href="{% url 'restaurante:detalle_eliminar' detalle.pk %}">Eliminar</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="5">No hay detalles de reserva registrados.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

@@ -6,6 +6,10 @@ app_name = "restaurante"
 urlpatterns = [
     path("", views.inicio, name="inicio"),
     path("menu/", views.menu, name="menu"),
+    path("detalles/", views.detalle_lista, name="detalle_lista"),
+    path("detalles/crear/", views.detalle_crear, name="detalle_crear"),
+    path("detalles/<int:pk>/editar/", views.detalle_editar, name="detalle_editar"),
+    path("detalles/<int:pk>/eliminar/", views.detalle_eliminar, name="detalle_eliminar"),
     path("reservas/<int:pk>/cancelar/", views.reserva_cancelar, name="reserva_cancelar"),
 
     # Clientes

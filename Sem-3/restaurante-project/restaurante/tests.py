@@ -1,10 +1,60 @@
 from django.db import IntegrityError
 from django.test import TransactionTestCase, Client as HttpClient
 from django.urls import reverse
-from .models import Persona, Cliente, Administrador, Mesa, Reserva, Categoria, Plato
+from .models import Persona, Cliente, Administrador, Mesa, Reserva, Categoria, Plato, DetalleReserva
 
 
 class RestauranteTests(TransactionTestCase):
+    def test_crud_detalle_reserva(self):
+        reserva = Reserva.objects.create(
+            cliente=self.cliente, mesa=self.mesa, fecha="2026-10-10",
+            hora="19:00", cantidad_personas=2,
+        )
+        plato = Plato.objects.create(nombre="Sopa", precio="12.50", categoria=self.categoria)
+        datos = dict(reserva=reserva.pk, plato=plato.pk, cantidad=2, precio_unitario="10.00")
+        self.assertEqual(self.client.get(self.url("detalle", "crear")).status_code, 200)
+        self.assertRedirects(self.client.post(self.url("detalle", "crear"), datos), self.url("detalle", "lista"))
+        detalle = DetalleReserva.objects.get()
+        self.assertContains(self.client.get(self.url("detalle", "lista")), "Sopa")
+        self.assertTrue(reserva.platos.filter(pk=plato.pk).exists())
+        self.assertContains(self.client.get(self.url("plato", "lista")), "Cantidad: 2")
+        self.assertEqual(self.client.get(self.url("detalle", "editar", detalle.pk)).status_code, 200)
+        datos.update(cantidad=3, precio_unitario="11.00")
+        self.assertRedirects(self.client.post(self.url("detalle", "editar", detalle.pk), datos), self.url("detalle", "lista"))
+        detalle.refresh_from_db()
+        self.assertEqual(detalle.cantidad, 3)
+        self.assertEqual(str(detalle.precio_unitario), "11.00")
+        plato.refresh_from_db()
+        self.assertEqual(str(plato.precio), "12.50")
+        eliminar = self.url("detalle", "eliminar", detalle.pk)
+        self.assertEqual(self.client.get(eliminar).status_code, 200)
+        self.assertTrue(DetalleReserva.objects.filter(pk=detalle.pk).exists())
+        navegador = HttpClient(enforce_csrf_checks=True)
+        self.assertEqual(navegador.post(eliminar).status_code, 403)
+        self.assertRedirects(self.client.post(eliminar), self.url("detalle", "lista"))
+        self.assertFalse(DetalleReserva.objects.exists())
+        self.assertTrue(Reserva.objects.filter(pk=reserva.pk).exists())
+        self.assertTrue(Plato.objects.filter(pk=plato.pk).exists())
+        self.assertEqual(self.client.get(eliminar).status_code, 404)
+
+    def test_detalle_rechaza_valores_invalidos_y_duplicados(self):
+        reserva = Reserva.objects.create(
+            cliente=self.cliente, mesa=self.mesa, fecha="2026-10-10",
+            hora="19:00", cantidad_personas=2,
+        )
+        plato = Plato.objects.create(nombre="Sopa", precio=12, categoria=self.categoria)
+        datos = dict(reserva=reserva.pk, plato=plato.pk, cantidad=1, precio_unitario="12.00")
+        for cambios in [dict(cantidad=0), dict(cantidad=-1), dict(precio_unitario="-0.01"), dict(plato=99999)]:
+            with self.subTest(cambios=cambios):
+                response = self.client.post(self.url("detalle", "crear"), {**datos, **cambios})
+                self.assertEqual(response.status_code, 200)
+                self.assertTrue(response.context["form"].errors)
+        self.assertFalse(DetalleReserva.objects.exists())
+        self.client.post(self.url("detalle", "crear"), datos)
+        response = self.client.post(self.url("detalle", "crear"), datos)
+        self.assertTrue(response.context["form"].errors)
+        self.assertEqual(DetalleReserva.objects.count(), 1)
+
     def setUp(self):
         self.persona = Persona.objects.create(nombres="Ana", apellidos="Pérez", documento="123", telefono="999999999", correo="ana@example.com")
         self.cliente = Cliente.objects.create(persona=self.persona)
