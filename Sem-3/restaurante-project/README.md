@@ -2,6 +2,10 @@
 
 Proyecto Django de reservas de restaurante, ampliado en la Semana 4 con relaciones uno a uno, uno a muchos y muchos a muchos mediante un modelo intermedio con CRUD propio.
 
+En Semana 5 se personaliza Django Admin para gestionar los diez modelos existentes y editar las tres relaciones desde una reserva. No se agregan modelos ni migraciones nuevas.
+
+Guia de respuestas y capturas de los 14 ejercicios: [docs/SEMANA_5.md](docs/SEMANA_5.md).
+
 Repositorio: https://github.com/fabian-raam/apps-empresariales
 
 Carpeta del proyecto: `Sem-3/restaurante-project`.
@@ -31,7 +35,7 @@ El registro manual de mesas, clientes y horarios puede causar reservas duplicada
 
 - Clientes: personas que reservan mesas y consultan el menú.
 - Administradores y personal del restaurante: gestionan clientes, mesas, reservas y platos.
-- Superusuarios de Django: gestionan los siete modelos originales registrados en `/admin/`.
+- Superusuarios de Django: gestionan los diez modelos registrados en `/admin/`.
 
 Las pantallas del ejercicio son de acceso público y no implementan autenticación por roles. El modelo Administrador representa datos del personal; registrarlo no crea una cuenta de Django ni concede acceso al Admin.
 
@@ -39,7 +43,7 @@ Las pantallas del ejercicio son de acceso público y no implementan autenticaci�
 
 - Navegación a las secciones originales, al menú y a los detalles de reserva.
 - Crear, listar, editar y eliminar detalles de reserva, seleccionando reserva y plato e indicando cantidad y precio unitario.
-- Mostrar la ficha y las solicitudes de cada reserva, y los pedidos asociados a cada plato. Fichas y solicitudes no tienen formulario web propio; pueden registrarse mediante ORM.
+- Mostrar la ficha y las solicitudes de cada reserva, y los pedidos asociados a cada plato. Fichas y solicitudes se gestionan desde Django Admin, individualmente o dentro de la reserva.
 - Crear, listar, editar y eliminar clientes, administradores, mesas, reservas, categorías y platos. Persona se guarda internamente desde los formularios de cliente y administrador; no tiene una sección independiente en la web.
 - Registrar y editar Persona junto con Cliente o Administrador con guardados consecutivos. No se selecciona una Persona preexistente en esos formularios.
 - Validar documento y correo únicos, estados de reserva, cantidad positiva y capacidad de mesa.
@@ -80,6 +84,31 @@ Se conservan las relaciones CASCADE originales: eliminar Persona elimina sus rol
 Los formularios y Django Admin ejecutan las validaciones del modelo. Al escribir directamente desde scripts con ORM, llamar a `full_clean()` antes de `save()` para validar reglas como la capacidad; `save()` no lo ejecuta automáticamente. La base de datos protege además el horario único, los estados válidos y la cantidad positiva.
 
 ## Instalación y ejecución (PowerShell)
+
+### Administracion de Semana 5
+
+Todos los modelos se registran explicitamente con `admin.site.register(Modelo, ModeloAdmin)` en `restaurante/admin.py`.
+
+| Modelo | Columnas principales | Busqueda | Filtros |
+| --- | --- | --- | --- |
+| Persona | ID, nombres, apellidos, documento, telefono, correo | Nombre, apellido, documento, correo | Fecha de registro |
+| Cliente | ID, persona | Nombre, apellido, documento | Ninguno |
+| Administrador | ID, persona, contratacion | Nombre, apellido, documento | Contratacion |
+| Mesa | ID, numero, capacidad, disponible | Numero | Disponible, capacidad |
+| Categoria | ID, nombre, activa | Nombre | Activa |
+| Plato | ID, nombre, categoria, precio | Nombre y categoria | Categoria |
+| Reserva | ID, cliente, mesa, fecha, hora, cantidad, estado | Nombre, apellido y documento del cliente | Estado, fecha, mesa |
+| FichaReserva | ID, reserva, ocasion, observaciones | Ocasion, observaciones, nombre del cliente | Ninguno |
+| SolicitudReserva | ID, reserva, descripcion, atendida | Descripcion y nombre del cliente | Atendida |
+| DetalleReserva | ID, reserva, plato, cantidad, precio unitario | Plato, nombre y apellido del cliente | Plato, estado de reserva |
+
+`ReservaAdmin` incluye `FichaReservaInline` (`StackedInline`, maximo una ficha), `SolicitudReservaInline` (`TabularInline`, descripcion y atendida) y `DetalleReservaInline` (`TabularInline`, plato, cantidad y precio unitario). El campo N:M con `through` se gestiona desde el modelo intermedio. Los selectores relacionados tienen autocompletado y los listados usan `list_select_related` para consultar sus relaciones.
+
+El panel reutiliza los modelos, validaciones, ORM y plantillas de Django. Proporciona autenticacion, permisos, busquedas, filtros y formularios para el personal. Las paginas del cliente final, el menu publico y los flujos particulares del restaurante siguen utilizando vistas y plantillas propias. El encabezado del panel se personaliza con `site_header`, `site_title` e `index_title`.
+
+Crear un superusuario en una instalacion nueva con `manage.py createsuperuser`. La cuenta local de demostracion y SQLite no se publican en GitHub. Un usuario normal no tiene acceso al panel; un usuario staff necesita permisos sobre los modelos.
+
+### Ejecutar el proyecto
 
 Probado con Python 3.14.4 y Django 6.1.1. Desde esta carpeta, usar el entorno `.venv` existente:
 
@@ -128,6 +157,8 @@ Cada entidad ofrece `crear/`, `<id>/editar/` y `<id>/eliminar/` bajo su ruta. Ca
 Las pruebas cubren CRUD de las seis secciones, creación y edición de Persona con sus roles, rechazo de formularios inválidos, duplicados, capacidad, estados, mesas disponibles, cancelación, eliminación en cascada, filtros del menú, formularios precargados, errores 404 y protección CSRF. Django crea una base temporal para las pruebas y conserva la base de desarrollo.
 
 Se añadieron dos pruebas para DetalleReserva: creación, consulta, edición de cantidad y precio, eliminación sin borrar reserva ni plato, CSRF y rechazo de valores inválidos y duplicados. Ejecutar `manage.py test` para verificar el estado actual antes de publicar.
+
+Semana 5 agrega cinco pruebas en `restaurante/test_admin.py`: registro y listados de los diez modelos; CRUD de las tres relaciones mediante Inlines; rechazo atomico de cantidades/precios invalidos; busqueda y filtros; y restricciones de acceso. La suite completa contiene 21 pruebas. Las pruebas utilizan SQLite temporal y no borran los datos de desarrollo.
 
 Los archivos principales son `restaurante/models.py`, `forms.py`, `views.py`, `urls.py`, `admin.py`, `tests.py`, las plantillas de `restaurante/templates/restaurante/` y `restaurante/static/restaurante/estilos.css`.
 
