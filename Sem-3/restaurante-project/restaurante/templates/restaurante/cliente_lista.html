@@ -19,8 +19,7 @@
             <td>{{ cliente.persona.telefono }}</td>
             <td>{{ cliente.persona.correo }}</td>
             <td class="acciones">
-                <a href="{% url 'restaurante:cliente_editar' cliente.pk %}">Editar</a>
-                <a href="{% url 'restaurante:cliente_eliminar' cliente.pk %}">Eliminar</a>
+                {% include 'restaurante/_acciones_crud.html' with registro=cliente editar_ruta='restaurante:cliente_editar' eliminar_ruta='restaurante:cliente_eliminar' %}
             </td>
         </tr>
         {% empty %}

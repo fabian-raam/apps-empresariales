@@ -17,10 +17,9 @@
             <td>{{ administrador.persona }}</td>
             <td>{{ administrador.persona.documento }}</td>
             <td>{{ administrador.persona.correo }}</td>
-            <td>{{ administrador.fecha_contratacion }}</td>
+            <td>{{ administrador.fecha_contratacion|date:"d/m/Y" }}</td>
             <td class="acciones">
-                <a href="{% url 'restaurante:administrador_editar' administrador.pk %}">Editar</a>
-                <a href="{% url 'restaurante:administrador_eliminar' administrador.pk %}">Eliminar</a>
+                {% include 'restaurante/_acciones_crud.html' with registro=administrador editar_ruta='restaurante:administrador_editar' eliminar_ruta='restaurante:administrador_eliminar' %}
             </td>
         </tr>
         {% empty %}

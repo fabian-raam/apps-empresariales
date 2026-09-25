@@ -15,7 +15,8 @@
     <tbody>
         {% for plato in platos %}
         <tr>
-            <td>{{ plato.nombre }}</td>
+            {# El nombre se presenta en mayúsculas para destacar cada plato. #}
+            <td>{{ plato.nombre|upper }}</td>
             <td>{{ plato.categoria }}</td>
             <td>{{ plato.precio }}</td>
             <td>{{ plato.img_url|default:"Sin imagen" }}</td>
@@ -34,8 +35,7 @@
                 </ul>
             </td>
             <td class="acciones">
-                <a href="{% url 'restaurante:plato_editar' plato.pk %}">Editar</a>
-                <a href="{% url 'restaurante:plato_eliminar' plato.pk %}">Eliminar</a>
+                {% include 'restaurante/_acciones_crud.html' with registro=plato editar_ruta='restaurante:plato_editar' eliminar_ruta='restaurante:plato_eliminar' %}
             </td>
         </tr>
         {% empty %}

@@ -20,7 +20,7 @@
         <tr>
             <td>{{ reserva.cliente }}</td>
             <td>{{ reserva.mesa }}</td>
-            <td>{{ reserva.fecha }}</td>
+            <td>{{ reserva.fecha|date:"d/m/Y" }}</td>
             <td>{{ reserva.hora }}</td>
             <td>{{ reserva.cantidad_personas }}</td>
             <td>{{ reserva.get_estado_display }}</td>
@@ -42,8 +42,7 @@
                 </ul>
             </td>
             <td class="acciones">
-                <a href="{% url 'restaurante:reserva_editar' reserva.pk %}">Editar</a>
-                <a href="{% url 'restaurante:reserva_eliminar' reserva.pk %}">Eliminar</a>
+                {% include 'restaurante/_acciones_crud.html' with registro=reserva editar_ruta='restaurante:reserva_editar' eliminar_ruta='restaurante:reserva_eliminar' %}
                 {% if reserva.estado != 'cancelada' %}
                 <a href="{% url 'restaurante:reserva_cancelar' reserva.pk %}">Cancelar reserva</a>
                 {% endif %}

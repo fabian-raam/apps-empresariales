@@ -4,7 +4,7 @@ Proyecto Django de reservas de restaurante, ampliado en la Semana 4 con relacion
 
 En Semana 5 se personaliza Django Admin para gestionar los diez modelos existentes y editar las tres relaciones desde una reserva. No se agregan modelos ni migraciones nuevas.
 
-Guia de respuestas y capturas de los 14 ejercicios: [docs/SEMANA_5.md](docs/SEMANA_5.md).
+Guia de respuestas y capturas de la Semana 5: [docs/SEMANA_5.md](docs/SEMANA_5.md). Guia de herencia, filtros, includes y evidencias de la Semana 6: [docs/SEMANA_6.md](docs/SEMANA_6.md).
 
 Repositorio: https://github.com/fabian-raam/apps-empresariales
 
@@ -173,5 +173,7 @@ Las vistas y rutas están escritas explícitamente para cada entidad. Por ejempl
 5. `cliente_editar` carga los datos personales con `instance=cliente.persona`; `cliente_eliminar` muestra la confirmación y solo elimina al recibir POST.
 
 Las otras entidades siguen el mismo patrón con sus propias funciones. No se utiliza un diccionario `SECCIONES` ni se generan rutas automáticamente. Cada listado escribe directamente sus columnas y campos en HTML. Se comparten `base.html`, `lista.html`, `form.html` y `confirmar.html` para reutilizar la presentación.
+
+En Semana 6, los listados reutilizan `base.html` mediante herencia. El parcial `_acciones_crud.html` comparte los enlaces de edición y eliminación, y los filtros `date`, `upper` y `floatformat` dan formato a datos existentes. Los valores siguen protegidos por el autoescape predeterminado de Django. No se agregaron dependencias; ver [docs/SEMANA_6.md](docs/SEMANA_6.md) para respuestas y guía de capturas.
 
 Se usa un flujo sencillo: validar el formulario, guardar y redirigir. No hay bloques de transacciones, manejo de excepciones ni decoradores de métodos HTTP en las vistas. Si falla el segundo guardado de un cliente o administrador, el primero no se revierte automáticamente.

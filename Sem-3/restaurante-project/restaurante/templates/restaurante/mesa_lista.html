@@ -17,8 +17,7 @@
             <td>{{ mesa.capacidad }}</td>
             <td>{{ mesa.disponible|yesno:"Sí,No" }}</td>
             <td class="acciones">
-                <a href="{% url 'restaurante:mesa_editar' mesa.pk %}">Editar</a>
-                <a href="{% url 'restaurante:mesa_eliminar' mesa.pk %}">Eliminar</a>
+                {% include 'restaurante/_acciones_crud.html' with registro=mesa editar_ruta='restaurante:mesa_editar' eliminar_ruta='restaurante:mesa_eliminar' %}
             </td>
         </tr>
         {% empty %}

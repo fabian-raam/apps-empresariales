@@ -19,8 +19,7 @@
             <td>{{ detalle.cantidad }}</td>
             <td>S/ {{ detalle.precio_unitario|floatformat:2 }}</td>
             <td class="acciones">
-                <a href="{% url 'restaurante:detalle_editar' detalle.pk %}">Editar</a>
-                <a href="{% url 'restaurante:detalle_eliminar' detalle.pk %}">Eliminar</a>
+                {% include 'restaurante/_acciones_crud.html' with registro=detalle editar_ruta='restaurante:detalle_editar' eliminar_ruta='restaurante:detalle_eliminar' %}
             </td>
         </tr>
         {% empty %}
