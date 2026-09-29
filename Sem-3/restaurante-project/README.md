@@ -6,6 +6,8 @@ En Semana 5 se personaliza Django Admin para gestionar los diez modelos existent
 
 Guia de respuestas y capturas de la Semana 5: [docs/SEMANA_5.md](docs/SEMANA_5.md). Guia de herencia, filtros, includes y evidencias de la Semana 6: [docs/SEMANA_6.md](docs/SEMANA_6.md).
 
+Guia ORM avanzado de la Semana 7: [docs/SEMANA_7.md](docs/SEMANA_7.md). Incluye una operacion transaccional de reservas que descuenta `Plato.existencias`, reportes con `aggregate()`/`annotate()`, un `ReservaQuerySet` reutilizable y medicion de consultas para las relaciones del listado de platos. La migracion `0004` agrega existencias; no se incorporan dependencias nuevas. Los datos de evidencia se pueden generar con `manage.py cargar_demo_semana7`.
+
 Repositorio: https://github.com/fabian-raam/apps-empresariales
 
 Carpeta del proyecto: `Sem-3/restaurante-project`.
@@ -148,6 +150,8 @@ Las versiones de `requirements.txt` coinciden con los paquetes del entorno local
 | Categorías | `/categorias/` |
 | Platos | `/platos/` |
 | Detalles de reserva | `/detalles/` |
+| Operacion transaccional | `/reservas/operacion/` |
+| Reportes ORM | `/reportes/` |
 | Django Admin | `/admin/` |
 
 Cada entidad ofrece `crear/`, `<id>/editar/` y `<id>/eliminar/` bajo su ruta. Cancelación: `/reservas/<id>/cancelar/`. Los nombres siguen `restaurante:<entidad>_lista`, `_crear`, `_editar`, `_eliminar`; la cancelación usa `restaurante:reserva_cancelar`.
@@ -176,4 +180,4 @@ Las otras entidades siguen el mismo patrón con sus propias funciones. No se uti
 
 En Semana 6, los listados reutilizan `base.html` mediante herencia. El parcial `_acciones_crud.html` comparte los enlaces de edición y eliminación, y los filtros `date`, `upper` y `floatformat` dan formato a datos existentes. Los valores siguen protegidos por el autoescape predeterminado de Django. No se agregaron dependencias; ver [docs/SEMANA_6.md](docs/SEMANA_6.md) para respuestas y guía de capturas.
 
-Se usa un flujo sencillo: validar el formulario, guardar y redirigir. No hay bloques de transacciones, manejo de excepciones ni decoradores de métodos HTTP en las vistas. Si falla el segundo guardado de un cliente o administrador, el primero no se revierte automáticamente.
+La operación nueva de Semana 7 guarda una reserva, el detalle del plato y el descuento de existencias dentro de `transaction.atomic()`. Las otras vistas CRUD conservan su flujo original. Si falla el registro de la reserva, el descuento se revierte junto con los registros relacionados.

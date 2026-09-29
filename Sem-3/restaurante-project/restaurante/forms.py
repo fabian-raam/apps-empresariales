@@ -35,6 +35,17 @@ class DetalleReservaForm(forms.ModelForm):
         ).order_by("-fecha", "-hora")
         self.fields["plato"].queryset = Plato.objects.order_by("nombre")
 
+
+class OperacionReservaForm(forms.Form):
+    """Registra una reserva y descuenta existencias del plato elegido."""
+    cliente = forms.ModelChoiceField(queryset=Cliente.objects.select_related("persona"))
+    mesa = forms.ModelChoiceField(queryset=Mesa.objects.filter(disponible=True).order_by("numero"))
+    fecha = forms.DateField(widget=forms.DateInput(attrs={"type": "date"}))
+    hora = forms.TimeField(widget=forms.TimeInput(attrs={"type": "time"}))
+    cantidad_personas = forms.IntegerField(min_value=1)
+    plato = forms.ModelChoiceField(queryset=Plato.objects.order_by("nombre"))
+    cantidad = forms.IntegerField(min_value=1, label="Cantidad de platos")
+
 class AdministradorForm(forms.ModelForm):
     class Meta:
         model = Administrador
@@ -59,10 +70,18 @@ class CategoriaForm(forms.ModelForm):
 
 
 class PlatoForm(forms.ModelForm):
+    existencias = forms.IntegerField(min_value=0, required=False, initial=100)
+
     class Meta:
         model = Plato
-        fields = ["categoria", "nombre", "precio", "img_url"]
+        fields = ["categoria", "nombre", "precio", "existencias", "img_url"]
         labels = {"categoria": "Categoría", "img_url": "URL de imagen (opcional)"}
+
+    def clean_existencias(self):
+        valor = self.cleaned_data.get("existencias")
+        if valor is not None:
+            return valor
+        return self.instance.existencias if self.instance.pk else 100
 
 
 class ReservaForm(forms.ModelForm):

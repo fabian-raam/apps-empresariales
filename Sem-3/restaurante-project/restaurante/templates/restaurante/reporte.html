@@ -1,0 +1,18 @@
+{% extends "restaurante/base.html" %}
+{% block titulo %}Reportes{% endblock %}
+{% block contenido %}
+<h1>Reportes del restaurante</h1>
+<section class="tarjeta">
+  <h2>Totales de los detalles</h2>
+  <p>Monto total: S/ {{ total.monto_total|default:0|floatformat:2 }}</p>
+  <p>Unidades pedidas: {{ total.unidades|default:0 }}</p>
+</section>
+<h2>Reservas y sus pedidos</h2>
+<div class="tabla"><table><thead><tr><th>Reserva</th><th>Estado</th><th>Detalles</th><th>Total</th></tr></thead><tbody>
+{% for reserva in reservas %}<tr><td>#{{ reserva.pk }} — {{ reserva.cliente.persona }}</td><td>{{ reserva.get_estado_display }}</td><td>{{ reserva.cantidad_detalles }}</td><td>S/ {{ reserva.total_reserva|default:0|floatformat:2 }}</td></tr>{% empty %}<tr><td colspan="4">No hay reservas para mostrar.</td></tr>{% endfor %}
+</tbody></table></div>
+<h2>Resumen por estado</h2>
+<div class="tabla"><table><thead><tr><th>Estado</th><th>Reservas</th><th>Unidades</th></tr></thead><tbody>
+{% for fila in por_estado %}<tr><td>{{ fila.estado }}</td><td>{{ fila.reservas }}</td><td>{{ fila.unidades|default:0 }}</td></tr>{% empty %}<tr><td colspan="3">No hay resultados.</td></tr>{% endfor %}
+</tbody></table></div>
+{% endblock %}

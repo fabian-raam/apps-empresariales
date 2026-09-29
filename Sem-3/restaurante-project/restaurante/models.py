@@ -1,6 +1,8 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
+from django.db.models import QuerySet
+from django.utils import timezone
 
 # Create your models here.
 class Persona(models.Model):
@@ -55,6 +57,7 @@ class Plato(models.Model):
     )
     nombre = models.CharField(max_length=100)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
+    existencias = models.PositiveIntegerField(default=100)
     img_url = models.URLField(blank=True, null=True)
 
     def __str__(self):
@@ -77,6 +80,19 @@ class Mesa(models.Model):
             raise ValidationError({"capacidad": "Existen reservas que superan esta capacidad."})
 
     
+class ReservaQuerySet(QuerySet):
+    def con_estado(self, estado=None):
+        """Filtra por estado si se indica; conserva el queryset si no."""
+        return self.filter(estado=estado) if estado else self
+
+    def del_mes_actual(self, activo=False):
+        """Limita a las reservas del mes en curso cuando se solicita."""
+        if not activo:
+            return self
+        hoy = timezone.localdate()
+        return self.filter(fecha__year=hoy.year, fecha__month=hoy.month)
+
+
 class Reserva(models.Model):
     ESTADOS = [
         ("pendiente", "Pendiente"),
@@ -113,6 +129,8 @@ class Reserva(models.Model):
         choices=ESTADOS,
         default="pendiente",
     )
+
+    objects = ReservaQuerySet.as_manager()
 
     class Meta:
         constraints = [

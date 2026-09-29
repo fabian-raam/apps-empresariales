@@ -32,6 +32,8 @@ urlpatterns = [
 
     # Reservas
     path("reservas/", views.reserva_lista, name="reserva_lista"),
+    path("reservas/operacion/", views.reserva_operacion, name="reserva_operacion"),
+    path("reportes/", views.reporte, name="reporte"),
     path("reservas/crear/", views.reserva_crear, name="reserva_crear"),
     path("reservas/<int:pk>/editar/", views.reserva_editar, name="reserva_editar"),
     path("reservas/<int:pk>/eliminar/", views.reserva_eliminar, name="reserva_eliminar"),

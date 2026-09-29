@@ -1,7 +1,10 @@
 from django.contrib import messages
+from django.core.exceptions import ValidationError
+from django.db import IntegrityError, transaction
+from django.db.models import Count, DecimalField, F, Sum
 from django.shortcuts import get_object_or_404, redirect, render
 
-from .forms import PersonaForm, AdministradorForm, MesaForm, ReservaForm, CategoriaForm, PlatoForm, DetalleReservaForm
+from .forms import PersonaForm, AdministradorForm, MesaForm, ReservaForm, CategoriaForm, PlatoForm, DetalleReservaForm, OperacionReservaForm
 from .models import Cliente, Administrador, Mesa, Reserva, Categoria, Plato, DetalleReserva
 
 def inicio(request):
@@ -202,7 +205,9 @@ def mesa_eliminar(request, pk):
 # Reservas
 def reserva_lista(request):
     reservas = (
-        Reserva.objects.select_related("cliente__persona", "mesa", "ficha")
+        Reserva.objects.con_estado(request.GET.get("estado"))
+        .del_mes_actual(request.GET.get("mes") == "actual")
+        .select_related("cliente__persona", "mesa", "ficha")
         .prefetch_related("solicitudes")
         .order_by("-fecha", "-hora")
     )
@@ -210,6 +215,75 @@ def reserva_lista(request):
         "reservas": reservas,
         "titulo": "Reservas",
         "crear_ruta": "restaurante:reserva_crear",
+    })
+
+
+def reserva_operacion(request):
+    """Guarda reserva, detalle y descuento de inventario como una unidad."""
+    if request.method == "POST":
+        form = OperacionReservaForm(request.POST)
+        if form.is_valid():
+            datos = form.cleaned_data
+            try:
+                with transaction.atomic():
+                    actualizado = Plato.objects.filter(
+                        pk=datos["plato"].pk,
+                        existencias__gte=datos["cantidad"],
+                    ).update(existencias=F("existencias") - datos["cantidad"])
+                    if not actualizado:
+                        raise ValueError("No hay existencias suficientes del plato elegido.")
+
+                    reserva = Reserva(
+                        cliente=datos["cliente"], mesa=datos["mesa"],
+                        fecha=datos["fecha"], hora=datos["hora"],
+                        cantidad_personas=datos["cantidad_personas"], estado="pendiente",
+                    )
+                    reserva.full_clean()
+                    reserva.save()
+                    DetalleReserva.objects.create(
+                        reserva=reserva,
+                        plato=datos["plato"],
+                        cantidad=datos["cantidad"],
+                        precio_unitario=datos["plato"].precio,
+                    )
+            except ValueError as error:
+                form.add_error(None, str(error))
+            except (ValidationError, IntegrityError) as error:
+                form.add_error(None, "No se registró la operación: revise la mesa, el horario y los datos. " + str(error))
+            else:
+                messages.success(request, "Reserva creada y existencias actualizadas.")
+                return redirect("restaurante:reserva_lista")
+    else:
+        form = OperacionReservaForm()
+    return render(request, "restaurante/operacion_reserva.html", {"form": form})
+
+
+def reporte(request):
+    """Reportes agregados del restaurante con relaciones precargadas."""
+    solo_mes = request.GET.get("mes") == "actual"
+    base = Reserva.objects.con_estado(request.GET.get("estado")).del_mes_actual(solo_mes)
+    total = DetalleReserva.objects.aggregate(
+        monto_total=Sum(
+            F("cantidad") * F("precio_unitario"),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        ),
+        unidades=Sum("cantidad"),
+    )
+    reservas = base.annotate(
+        cantidad_detalles=Count("detalles", distinct=True),
+        total_reserva=Sum(
+            F("detalles__cantidad") * F("detalles__precio_unitario"),
+            output_field=DecimalField(max_digits=14, decimal_places=2),
+        ),
+    ).select_related("cliente__persona", "mesa").prefetch_related("detalles__plato").order_by("-fecha", "-hora")
+    por_estado = list(
+        base.values("estado").annotate(
+            reservas=Count("pk", distinct=True),
+            unidades=Sum("detalles__cantidad"),
+        ).order_by("-reservas", "estado")
+    )
+    return render(request, "restaurante/reporte.html", {
+        "total": total, "reservas": reservas, "por_estado": por_estado,
     })
 
 

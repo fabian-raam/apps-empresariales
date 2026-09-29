@@ -1,0 +1,12 @@
+{% extends "restaurante/base.html" %}
+{% block titulo %}Nueva operación{% endblock %}
+{% block contenido %}
+<h1>Registrar reserva y pedido</h1>
+<p>La reserva, el detalle del plato y el descuento de existencias se guardan juntos. Si falla una parte, se cancela toda la operación.</p>
+<form method="post" class="formulario">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+  {% for field in form %}<p>{{ field.label_tag }} {{ field }} {{ field.errors }}</p>{% endfor %}
+  <button type="submit">Registrar operación</button>
+</form>
+{% endblock %}

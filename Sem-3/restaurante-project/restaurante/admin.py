@@ -64,7 +64,7 @@ class CategoriaAdmin(admin.ModelAdmin):
 
 
 class PlatoAdmin(admin.ModelAdmin):
-    list_display = ("plato_id", "nombre", "categoria", "precio")
+    list_display = ("plato_id", "nombre", "categoria", "precio", "existencias")
     search_fields = ("nombre", "categoria__nombre")
     list_filter = ("categoria",)
     list_select_related = ("categoria",)

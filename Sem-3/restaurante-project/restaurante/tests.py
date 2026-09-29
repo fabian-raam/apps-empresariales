@@ -233,3 +233,48 @@ class RestauranteTests(TransactionTestCase):
             for campo in ["nombres", "apellidos", "documento", "telefono", "correo"]:
                 self.assertContains(response, f'name="{campo}"')
             self.assertNotContains(response, 'name="persona"')
+
+    def test_operacion_reserva_crea_detalle_y_descuenta_stock(self):
+        plato = Plato.objects.create(nombre="Plato transaccional", precio="15.00", categoria=self.categoria, existencias=5)
+        datos = {
+            "cliente": self.cliente.pk, "mesa": self.mesa.pk,
+            "fecha": "2026-12-10", "hora": "20:15", "cantidad_personas": 2,
+            "plato": plato.pk, "cantidad": 3,
+        }
+        response = self.client.post(reverse("restaurante:reserva_operacion"), datos)
+        self.assertRedirects(response, self.url("reserva", "lista"))
+        reserva = Reserva.objects.get()
+        detalle = DetalleReserva.objects.get(reserva=reserva, plato=plato)
+        plato.refresh_from_db()
+        self.assertEqual(detalle.cantidad, 3)
+        self.assertEqual(plato.existencias, 2)
+
+    def test_operacion_sin_existencias_revierte_todo(self):
+        plato = Plato.objects.create(nombre="Plato sin stock", precio="15.00", categoria=self.categoria, existencias=2)
+        datos = {
+            "cliente": self.cliente.pk, "mesa": self.mesa.pk,
+            "fecha": "2026-12-10", "hora": "20:15", "cantidad_personas": 2,
+            "plato": plato.pk, "cantidad": 3,
+        }
+        antes = (Reserva.objects.count(), DetalleReserva.objects.count())
+        response = self.client.post(reverse("restaurante:reserva_operacion"), datos)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "No hay existencias suficientes")
+        plato.refresh_from_db()
+        self.assertEqual((Reserva.objects.count(), DetalleReserva.objects.count()), antes)
+        self.assertEqual(plato.existencias, 2)
+
+    def test_reporte_renderiza_agregados_y_queryset_personalizado(self):
+        plato = Plato.objects.create(nombre="Plato reporte", precio="10.00", categoria=self.categoria)
+        reserva = Reserva.objects.create(
+            cliente=self.cliente, mesa=self.mesa, fecha="2026-10-10",
+            hora="19:00", cantidad_personas=2, estado="confirmada",
+        )
+        DetalleReserva.objects.create(reserva=reserva, plato=plato, cantidad=2, precio_unitario="10.00")
+        self.assertEqual(Reserva.objects.con_estado("confirmada").count(), 1)
+        self.assertEqual(Reserva.objects.con_estado("pendiente").count(), 0)
+        response = self.client.get(reverse("restaurante:reporte"))
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Reportes del restaurante")
+        self.assertContains(response, "20,00")
+        self.assertContains(response, "confirmada")
