@@ -6,6 +6,8 @@ En Semana 5 se personaliza Django Admin para gestionar los diez modelos existent
 
 Guia de respuestas y capturas de la Semana 5: [docs/SEMANA_5.md](docs/SEMANA_5.md). Guia de herencia, filtros, includes y evidencias de la Semana 6: [docs/SEMANA_6.md](docs/SEMANA_6.md).
 
+Guia de la API REST de la Semana 8: [docs/SEMANA_8.md](docs/SEMANA_8.md). La API usa Django REST Framework, serializers con validacion, ViewSets, un router, filtros y respuestas JSON para platos, categorias, mesas y reservas.
+
 Guia ORM avanzado de la Semana 7: [docs/SEMANA_7.md](docs/SEMANA_7.md). Incluye una operacion transaccional de reservas que descuenta `Plato.existencias`, reportes con `aggregate()`/`annotate()`, un `ReservaQuerySet` reutilizable y medicion de consultas para las relaciones del listado de platos. La migracion `0004` agrega existencias; no se incorporan dependencias nuevas. Los datos de evidencia se pueden generar con `manage.py cargar_demo_semana7`.
 
 Repositorio: https://github.com/fabian-raam/apps-empresariales
@@ -134,7 +136,7 @@ Abrir http://127.0.0.1:8010/. Para acceder a Django Admin, crear una cuenta:
 
 Se utiliza SQLite (`db.sqlite3`), que no debe borrarse para actualizar el sistema. La migración `0001_initial` se conserva y `0002_reserva_reserva_cantidad_positiva` agrega la restricción de cantidad mayor que cero. Si otra instalación tiene reservas con cantidad cero, deben corregirse antes de aplicar esa migración. `0003_detallereserva_reserva_platos_fichareserva_and_more` incorpora las tres nuevas entidades, la relación N:M y las restricciones de DetalleReserva. Idioma: español; zona horaria: America/Lima. La configuración actual corresponde a desarrollo local.
 
-Las versiones de `requirements.txt` coinciden con los paquetes del entorno local. La ampliación utiliza el ORM de Django y no necesita dependencias adicionales.
+Las versiones de `requirements.txt` coinciden con los paquetes del entorno local. La Semana 8 incorpora Django REST Framework para serializers, ViewSets, routers y la API navegable.
 
 ## URLs principales
 
@@ -152,6 +154,9 @@ Las versiones de `requirements.txt` coinciden con los paquetes del entorno local
 | Detalles de reserva | `/detalles/` |
 | Operacion transaccional | `/reservas/operacion/` |
 | Reportes ORM | `/reportes/` |
+| API navegable | `/api/` |
+| API de platos | `/api/platos/` |
+| API de reservas (solo lectura) | `/api/reservas/` |
 | Django Admin | `/admin/` |
 
 Cada entidad ofrece `crear/`, `<id>/editar/` y `<id>/eliminar/` bajo su ruta. Cancelación: `/reservas/<id>/cancelar/`. Los nombres siguen `restaurante:<entidad>_lista`, `_crear`, `_editar`, `_eliminar`; la cancelación usa `restaurante:reserva_cancelar`.
@@ -162,7 +167,7 @@ Las pruebas cubren CRUD de las seis secciones, creación y edición de Persona c
 
 Se añadieron dos pruebas para DetalleReserva: creación, consulta, edición de cantidad y precio, eliminación sin borrar reserva ni plato, CSRF y rechazo de valores inválidos y duplicados. Ejecutar `manage.py test` para verificar el estado actual antes de publicar.
 
-Semana 5 agrega cinco pruebas en `restaurante/test_admin.py`: registro y listados de los diez modelos; CRUD de las tres relaciones mediante Inlines; rechazo atomico de cantidades/precios invalidos; busqueda y filtros; y restricciones de acceso. La suite completa contiene 21 pruebas. Las pruebas utilizan SQLite temporal y no borran los datos de desarrollo.
+Semana 5 agrega pruebas en `restaurante/test_admin.py` para el registro, Inlines, búsquedas, filtros y acceso. `restaurante/test_api.py` cubre serializers, validación, CRUD HTTP, relaciones anidadas, filtros y consultas optimizadas. La suite completa contiene 30 pruebas y usa una base SQLite temporal, sin borrar los datos de desarrollo.
 
 Los archivos principales son `restaurante/models.py`, `forms.py`, `views.py`, `urls.py`, `admin.py`, `tests.py`, las plantillas de `restaurante/templates/restaurante/` y `restaurante/static/restaurante/estilos.css`.
 

@@ -1,7 +1,7 @@
-# Dependencias del restaurante (Semanas 5 y 6).
-# Herencia, filtros, include y autoescape forman parte del motor de Django.
-# La refactorizacion de plantillas no agrega paquetes adicionales.
+# Dependencias del restaurante (Semanas 5 a 8).
+# Django REST Framework agrega serializers, ViewSets y la API navegable.
 Django==6.1.1
+djangorestframework==3.18.3
 asgiref==3.12.1
 sqlparse==0.6.0
 tzdata==2026.3
