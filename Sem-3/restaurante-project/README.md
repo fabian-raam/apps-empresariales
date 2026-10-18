@@ -8,6 +8,8 @@ Guia de respuestas y capturas de la Semana 5: [docs/SEMANA_5.md](docs/SEMANA_5.m
 
 Guia de la API REST de la Semana 8: [docs/SEMANA_8.md](docs/SEMANA_8.md). La API usa Django REST Framework, serializers con validacion, ViewSets, un router, filtros y respuestas JSON para platos, categorias, mesas y reservas.
 
+Guia de React y Vite de la Semana 9: [docs/SEMANA_9.md](docs/SEMANA_9.md). El frontend esta en `frontend/`; usa arreglos de ejemplo con la forma de la API, practica JSX, condiciones, listas y relaciones anidadas. Todavia no consume la API.
+
 Guia ORM avanzado de la Semana 7: [docs/SEMANA_7.md](docs/SEMANA_7.md). Incluye una operacion transaccional de reservas que descuenta `Plato.existencias`, reportes con `aggregate()`/`annotate()`, un `ReservaQuerySet` reutilizable y medicion de consultas para las relaciones del listado de platos. La migracion `0004` agrega existencias; no se incorporan dependencias nuevas. Los datos de evidencia se pueden generar con `manage.py cargar_demo_semana7`.
 
 Repositorio: https://github.com/fabian-raam/apps-empresariales
@@ -137,6 +139,10 @@ Abrir http://127.0.0.1:8010/. Para acceder a Django Admin, crear una cuenta:
 Se utiliza SQLite (`db.sqlite3`), que no debe borrarse para actualizar el sistema. La migración `0001_initial` se conserva y `0002_reserva_reserva_cantidad_positiva` agrega la restricción de cantidad mayor que cero. Si otra instalación tiene reservas con cantidad cero, deben corregirse antes de aplicar esa migración. `0003_detallereserva_reserva_platos_fichareserva_and_more` incorpora las tres nuevas entidades, la relación N:M y las restricciones de DetalleReserva. Idioma: español; zona horaria: America/Lima. La configuración actual corresponde a desarrollo local.
 
 Las versiones de `requirements.txt` coinciden con los paquetes del entorno local. La Semana 8 incorpora Django REST Framework para serializers, ViewSets, routers y la API navegable.
+
+### Frontend React (Semana 9)
+
+Desde `restaurante-project/frontend`, instalar dependencias con `npm.cmd install` y ejecutar `npm.cmd run dev`. Para validar y compilar: `npm.cmd run lint` y `npm.cmd run build`. Consultar [docs/SEMANA_9.md](docs/SEMANA_9.md) para la explicación de ejercicios y capturas.
 
 ## URLs principales
 
