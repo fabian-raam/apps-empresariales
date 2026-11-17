@@ -10,6 +10,8 @@ Guia de la API REST de la Semana 8: [docs/SEMANA_8.md](docs/SEMANA_8.md). La API
 
 Guia de React y Vite de la Semana 9: [docs/SEMANA_9.md](docs/SEMANA_9.md). El frontend esta en `frontend/`; usa arreglos de ejemplo con la forma de la API, practica JSX, condiciones, listas y relaciones anidadas. Todavia no consume la API.
 
+Guia de Ajax con Axios de la Semana 12 (Parte 1): [docs/SEMANA_12_PARTE_1.md](docs/SEMANA_12_PARTE_1.md). La práctica consume la API de platos con GET, POST, PATCH y DELETE, búsqueda y estados de carga/error.
+
 Guia ORM avanzado de la Semana 7: [docs/SEMANA_7.md](docs/SEMANA_7.md). Incluye una operacion transaccional de reservas que descuenta `Plato.existencias`, reportes con `aggregate()`/`annotate()`, un `ReservaQuerySet` reutilizable y medicion de consultas para las relaciones del listado de platos. La migracion `0004` agrega existencias; no se incorporan dependencias nuevas. Los datos de evidencia se pueden generar con `manage.py cargar_demo_semana7`.
 
 Repositorio: https://github.com/fabian-raam/apps-empresariales
@@ -143,6 +145,10 @@ Las versiones de `requirements.txt` coinciden con los paquetes del entorno local
 ### Frontend React (Semana 9)
 
 Desde `restaurante-project/frontend`, instalar dependencias con `npm.cmd install` y ejecutar `npm.cmd run dev`. Para validar y compilar: `npm.cmd run lint` y `npm.cmd run build`. Consultar [docs/SEMANA_9.md](docs/SEMANA_9.md) para la explicación de ejercicios y capturas.
+
+### Práctica Ajax (Semana 12, Parte 1)
+
+Ejecutar Django desde la raíz con `.\.venv\Scripts\python.exe manage.py runserver 8010` y React desde `frontend` con `npm.cmd run dev`. Abrir `http://localhost:5173/` y pulsar “Abrir práctica Semana 12 (API)”. CORS permite el origen local de Vite. La instancia Axios usa `http://127.0.0.1:8010/api/` por defecto; se puede cambiar con `VITE_API_URL`. La práctica usa `/api/platos/` y `/api/categorias/`. Ver [docs/SEMANA_12_PARTE_1.md](docs/SEMANA_12_PARTE_1.md).
 
 ## URLs principales
 

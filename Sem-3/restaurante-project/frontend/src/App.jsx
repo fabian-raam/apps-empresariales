@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import './App.css'
+import ListaPractica from './practica/ListaPractica.jsx'
 
 const nombreAplicacion = 'Restaurante La Mesa'
 const impuesto = 0.18
@@ -59,10 +60,21 @@ function totalReserva(detalles) {
 
 function App() {
   const [mostrarVacio, setMostrarVacio] = useState(false)
+  const [vista, setVista] = useState('semana9')
   const platosVisibles = mostrarVacio ? [] : platos
+
+  if (vista === 'practica') {
+    return <ListaPractica onVolver={() => setVista('semana9')} />
+  }
 
   return (
     <main className="app">
+      <nav className="selector-vista" aria-label="Secciones de la aplicación">
+        <span>Demostración:</span>
+        <button className="boton-secundario" type="button" onClick={() => setVista('practica')}>
+          Abrir práctica Semana 12 (API)
+        </button>
+      </nav>
       <header className="encabezado">
         <p className="etiqueta">Semana 9 · Interfaz React</p>
         <h1>{nombreAplicacion}</h1>
@@ -160,7 +172,7 @@ function App() {
       </section>
 
       <footer className="pie">
-        React muestra los datos. La conexión con Django REST se realizará en una semana posterior.
+        Esta vista de Semana 9 conserva datos de ejemplo; la práctica de Semana 12 consulta Django REST.
       </footer>
     </main>
   )

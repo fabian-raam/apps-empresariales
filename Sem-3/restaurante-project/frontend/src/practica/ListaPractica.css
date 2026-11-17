@@ -1,0 +1,241 @@
+.practica {
+  display: grid;
+  gap: 20px;
+  width: min(1080px, calc(100% - 32px));
+  margin: 0 auto;
+  padding: 24px 0 48px;
+  color: #26372f;
+}
+
+.practica-barra,
+.practica-lista-titulo,
+.practica-acciones {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.practica-barra {
+  color: #63756b;
+  font-size: 0.9rem;
+}
+
+.practica button {
+  border: 1px solid #cbd8cf;
+  border-radius: 8px;
+  padding: 9px 12px;
+  background: #fff;
+  color: #174638;
+  cursor: pointer;
+  font: inherit;
+}
+
+.practica button:hover:not(:disabled) {
+  background: #edf5ef;
+}
+
+.practica button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.practica-volver {
+  font-weight: 700 !important;
+}
+
+.practica-encabezado {
+  padding: clamp(24px, 5vw, 42px);
+  border-radius: 20px;
+  color: #fff;
+  background: linear-gradient(125deg, #163b32, #27634f 72%, #b36b3e);
+}
+
+.practica-etiqueta {
+  margin: 0 0 8px;
+  color: #f0c49c;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.practica-encabezado h1,
+.practica-panel h2 {
+  margin: 0;
+}
+
+.practica-encabezado h1 {
+  color: #fff;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.practica-encabezado p:last-child {
+  margin: 12px 0 0;
+  color: #e7ede7;
+}
+
+.practica-panel {
+  padding: clamp(18px, 3vw, 26px);
+  border: 1px solid #e1e7df;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 24px rgb(27 50 41 / 5%);
+}
+
+.practica-panel > label,
+.practica-formulario label {
+  display: grid;
+  gap: 7px;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.practica input,
+.practica select {
+  width: 100%;
+  min-height: 42px;
+  box-sizing: border-box;
+  border: 1px solid #cbd8cf;
+  border-radius: 8px;
+  padding: 9px 11px;
+  background: #fff;
+  color: #26372f;
+  font: inherit;
+  font-weight: 400;
+}
+
+.practica input:focus,
+.practica select:focus {
+  outline: 3px solid rgb(39 99 79 / 18%);
+  border-color: #27634f;
+}
+
+.practica-ayuda {
+  margin: 7px 0 0;
+  color: #68776f;
+  font-size: 0.84rem;
+  font-weight: 400;
+}
+
+.practica-formulario {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.practica-campo-ancho {
+  grid-column: 1 / -1;
+}
+
+.practica .practica-primario {
+  justify-self: start;
+  border-color: #174638;
+  background: #174638;
+  color: #fff;
+  font-weight: 700;
+}
+
+.practica .practica-primario:hover:not(:disabled) {
+  background: #27634f;
+}
+
+.practica-aviso {
+  margin: 0;
+  border-radius: 10px;
+  padding: 12px 15px;
+  overflow-wrap: anywhere;
+}
+
+.practica-exito {
+  border: 1px solid #b8ddc1;
+  background: #eff9f1;
+  color: #205b32;
+}
+
+.practica-error {
+  border: 1px solid #efc1b9;
+  background: #fff2ef;
+  color: #8d3026;
+}
+
+.practica-lista-titulo {
+  margin-bottom: 14px;
+}
+
+.practica-lista-titulo span {
+  color: #61756a;
+  font-size: 0.9rem;
+}
+
+.practica-tabla-contenedor {
+  overflow-x: auto;
+}
+
+.practica-tabla {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.practica-tabla th,
+.practica-tabla td {
+  border-bottom: 1px solid #e8ede8;
+  padding: 12px 10px;
+}
+
+.practica-tabla th {
+  color: #51645a;
+  font-size: 0.82rem;
+}
+
+.practica-tabla td {
+  font-size: 0.9rem;
+}
+
+.practica-acciones {
+  justify-content: flex-start;
+  flex-wrap: wrap;
+}
+
+.practica .practica-eliminar {
+  border-color: #e4b8b2;
+  color: #963c32;
+}
+
+.practica-vacio {
+  margin: 0;
+  border-radius: 10px;
+  padding: 18px;
+  background: #f5f8f5;
+}
+
+.practica-vacio p {
+  margin: 0 0 8px;
+}
+
+.practica-vacio p:last-child {
+  margin-bottom: 0;
+}
+
+@media (max-width: 640px) {
+  .practica {
+    width: min(100% - 24px, 1080px);
+  }
+
+  .practica-formulario {
+    grid-template-columns: 1fr;
+  }
+
+  .practica-campo-ancho {
+    grid-column: auto;
+  }
+
+  .practica-lista-titulo,
+  .practica-barra {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
